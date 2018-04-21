@@ -15,9 +15,9 @@ import java.util.*;
  * 本题中g(x) 显而易见的就是实际代价
  * h(x) 则定义为与最终状态不相同的个数
  */
-class ZeroXy {
-    int x;
-    int y;
+class ZeroXy {//0 的坐标
+    int x;//行号
+    int y;//列号
 
     public ZeroXy(int xx, int yy) {
         this.x = xx;
@@ -26,7 +26,7 @@ class ZeroXy {
 }
 
 public class demo {
-    public static int idnum = 1;//计数器
+    public static int idnum = 1;//id计数器
     //初始
     String[][] start = new String[3][3];
     //终态
@@ -35,7 +35,7 @@ public class demo {
     ArrayList<Item> openTable;
     //close表
     ArrayList<Item> closeTable;
-
+    //寻找路径栈
     Stack<Item> stackFind;
     public demo() {
         Scanner in = new Scanner(System.in);
@@ -103,6 +103,13 @@ public class demo {
                 for (int i = 0; i < s1.length; i++) {
                     Item newItem = addItem(s1[i],min);//获得新节点 传入参数动作 父节点
                     if (newItem == null) {//扩展失败则跳过本次 continue
+                        continue;
+                    }
+                    if (this.closeTable.contains(newItem)) {//如果在close表中已存在 则判断代价  代价要小 将close中移除加入open表  否则不变跳过本次
+                        if (newItem.sum < this.closeTable.get(this.closeTable.indexOf(newItem)).sum) { // 新代价小 close移除 open加入
+                            this.closeTable.remove(newItem);//移除
+                            this.openTable.add(newItem);//添加open中
+                        }
                         continue;
                     }
                     if (this.openTable.contains(newItem)) {//当前节点 表中已存在 若代价短则更新
@@ -259,8 +266,10 @@ public class demo {
         Iterator<Item> it = this.openTable.iterator();
         while (it.hasNext()) {
             Item tmp = it.next();
-            min = (tmp.sum < price) ? tmp : min;//记录最小的
-            price = tmp.sum;//更新最小值
+            if (tmp.sum < price) {
+                min = tmp;//记录最小的
+                price = tmp.sum;//更新最小值
+            }
         }
         this.openTable.remove(min);//从open表中移除
         return min;
